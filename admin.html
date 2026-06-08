@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 মাস্টার অ্যাডমিন প্যানেল</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f2e 100%);
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: bg-glow 10s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes bg-glow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header h1 { 
+            font-size: 32px; 
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #1c1f26;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #30363d;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 20px;
+            border: 2px solid #30363d;
+            background: #0d1117;
+            color: #8b949e;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab-btn:hover {
+            border-color: #79c0ff;
+            color: #79c0ff;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .master-panel {
+            background: #1c1f26;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .master-panel h2 {
+            color: #79c0ff;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-shadow: 0 0 10px rgba(121, 192, 255, 0.2);
+        }
+        
+        .display-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .display-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .display-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .control-section {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #8b949e;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .control-input {
+            width: 100%;
+            padding: 12px;
+            background: #0d1117;
+            border: 2px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .control-input:focus {
+            outline: none;
+            border-color: #79c0ff;
+            box-shadow: 0 0 15px rgba(121, 192, 255, 0.3);
+        }
+        
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .quick-btn {
+            padding: 12px;
+            border: 2px solid #30363d;
+            background: #0d1117;
+            color: #79c0ff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: #da3633;
+            color: white;
+            box-shadow: 0 3px 10px rgba(218, 54, 51, 0.2);
+        }
+        
+        .btn-danger:hover {
+            background: #f85149;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(218, 54, 51, 0.3);
+        }
+        
+        .btn-success {
+            background: #238636;
+            color: white;
+            box-shadow: 0 3px 10px rgba(35, 134, 54, 0.2);
+        }
+        
+        .btn-success:hover {
+            background: #2ea043;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+        }
+        
+        .transaction-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .transaction-item {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .transaction-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .transaction-user {
+            color: #79c0ff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .transaction-details {
+            color: #8b949e;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        .transaction-amount {
+            color: #3fb950;
+            font-weight: bold;
+            font-size: 20px;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .transaction-status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .status-pending {
+            background: rgba(212, 160, 7, 0.2);
+            color: #d4a007;
+        }
+        
+        .status-approved {
+            background: rgba(63, 185, 80, 0.2);
+            color: #3fb950;
+        }
+        
+        .status-rejected {
+            background: rgba(248, 81, 73, 0.2);
+            color: #f85149;
+        }
+        
+        .transaction-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .transaction-actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .message.show {
+            display: block;
+            animation: slide-in 0.3s ease-out;
+        }
+        
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.success {
+            background: rgba(63, 185, 80, 0.1);
+            color: #3fb950;
+            border: 1px solid #3fb950;
+        }
+        
+        .message.error {
+            background: rgba(248, 81, 73, 0.1);
+            color: #f85149;
+            border: 1px solid #f85149;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #1c1f26;
+            border: 1px solid #30363d;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #8b949e;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #79c0ff;
+        }
+
+        @media (max-width: 768px) {
+            .quick-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .transaction-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 মাস্টার অ্যাডমিন প্যানেল</h1>
+            <p>সম্পূর্ণ গেম নিয়ন্ত্রণ - সবকিছু এক জায়গায়</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 ড্যাশবোর্ড</button>
+            <button class="tab-btn" onclick="switchTab('balance')">💰 ব্যালেন্স</button>
+            <button class="tab-btn" onclick="switchTab('crash')">⚡ ক্রাশ সেট</button>
+            <button class="tab-btn" onclick="switchTab('deposit')">📥 ডিপোজিট</button>
+            <button class="tab-btn" onclick="switchTab('withdraw')">📤 উইথড্র</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ সেটিংস</button>
+        </div>
+
+        <!-- ড্যাশবোর্ড ট্যাব -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">💰 বর্তমান ব্যালেন্স</div>
+                    <div class="stat-value" id="dashBalance">৳0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">⚡ পরবর্তী ক্রাশ</div>
+                    <div class="stat-value" id="dashCrash">1.50x</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📥 পেন্ডিং ডিপোজিট</div>
+                    <div class="stat-value" id="dashPendingDep">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📤 পেন্ডিং উইথড্র</div>
+                    <div class="stat-value" id="dashPendingWit">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ব্যালেন্স ট্যাব -->
+        <div id="balance" class="tab-content">
+            <div class="master-panel">
+                <h2>💰 ব্যালেন্স নিয়ন্ত্রণ</h2>
+                
+                <div class="display-box">
+                    <div class="display-label">বর্তমান ব্যালেন্স</div>
+                    <div class="display-value" id="currentBalance">৳0</div>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">পরিমাণ যোগ করুন (৳)</label>
+                    <input type="number" id="addAmount" class="control-input" placeholder="পরিমাণ লিখুন" min="1">
+                    <button class="btn btn-primary" onclick="addBalance()">✅ যোগ করুন</button>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">দ্রুত যোগ করুন</label>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="quickAdd(100)">+100</button>
+                        <button class="quick-btn" onclick="quickAdd(500)">+500</button>
+                        <button class="quick-btn" onclick="quickAdd(1000)">+1000</button>
+                        <button class="quick-btn" onclick="quickAdd(5000)">+5000</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">পরিমাণ কাটুন (৳)</label>
+                    <input type="number" id="deductAmount" class="control-input" placeholder="পরিমাণ লিখুন" min="1">
+                    <button class="btn btn-danger" onclick="deductBalance()">❌ কাটুন</button>
+                </div>
+
+                <button class="btn btn-danger" onclick="resetBalance()">🔄 সম্পূর্ণ রিসেট (০)</button>
+            </div>
+        </div>
+
+        <!-- ক্রাশ ট্যাব -->
+        <div id="crash" class="tab-content">
+            <div class="master-panel">
+                <h2>⚡ ক্রাশ মাল্টিপ্লায়ার সেট করুন</h2>
+                
+                <div class="display-box">
+                    <div class="display-label">পরবর্তী ক্রাশ পয়েন্ট</div>
+                    <div class="display-value" id="crashDisplay">1.50x</div>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">মাল্টিপ্লায়ার (1.01 - 99.99)</label>
+                    <input type="number" id="crashInput" class="control-input" value="1.50" min="1.01" max="99.99" step="0.01">
+                    <button class="btn btn-primary" onclick="setCrash()">⚙️ সেট করুন</button>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">দ্রুত সেট করুন</label>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="quickCrash(1.5)">1.5x</button>
+                        <button class="quick-btn" onclick="quickCrash(2.5)">2.5x</button>
+                        <button class="quick-btn" onclick="quickCrash(5.0)">5.0x</button>
+                        <button class="quick-btn" onclick="quickCrash(10.0)">10x</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" onclick="randomCrash()">🎲 র‍্যান্ডম সেট</button>
+            </div>
+        </div>
+
+        <!-- ডিপোজিট ট্যাব -->
+        <div id="deposit" class="tab-content">
+            <div class="master-panel">
+                <h2>📥 ডিপোজিট রিকোয়েস্ট</h2>
+                <div class="transaction-list" id="depositsList">
+                    <div style="text-align: center; padding: 40px; color: #8b949e;">কোনো ডিপোজিট নেই</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- উইথড্র ট্যাব -->
+        <div id="withdraw" class="tab-content">
+            <div class="master-panel">
+                <h2>📤 উইথড্র রিকোয়েস্ট</h2>
+                <div class="transaction-list" id="withdrawsList">
+                    <div style="text-align: center; padding: 40px; color: #8b949e;">কোনো উইথড্র নেই</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- সেটিংস ট্যাব -->
+        <div id="settings" class="tab-content">
+            <div class="master-panel">
+                <h2>⚙️ সেটিংস</h2>
+                
+                <div class="control-section">
+                    <label class="control-label">পেমেন্ট নম্বর (বিকাশ/নগদ)</label>
+                    <input type="text" id="paymentNumber" class="control-input" placeholder="01300000000">
+                    <button class="btn btn-primary" onclick="updatePaymentNumber()">💾 সেভ করুন</button>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">গেম শিরোনাম</label>
+                    <input type="text" id="gameTitle" class="control-input" placeholder="✈️ ক্রাশ গেম">
+                    <button class="btn btn-primary" onclick="updateGameTitle()">💾 সেভ করুন</button>
+                </div>
+
+                <div class="master-panel" style="background: #0d1117; border: 1px dashed #30363d; margin-top: 20px;">
+                    <h3 style="color: #79c0ff; margin-bottom: 15px;">📋 আপনার লিংক শেয়ার করুন</h3>
+                    <div class="control-section">
+                        <label class="control-label">🎮 গেম লিংক (আপনার বন্ধুকে এটি পাঠান)</label>
+                        <input type="text" id="gameLink" class="control-input" readonly value="">
+                        <button class="btn btn-success" onclick="copyGameLink()">📋 কপি করুন</button>
+                    </div>
+                    <div class="control-section">
+                        <label class="control-label">🔐 এডমিন লিংক (শুধু আপনি ব্যবহার করুন)</label>
+                        <input type="text" id="adminLink" class="control-input" readonly value="">
+                        <button class="btn btn-success" onclick="copyAdminLink()">📋 কপি করুন</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'playerBalance';
+        const DEPOSITS_KEY = 'deposits_list';
+        const WITHDRAWS_KEY = 'withdraws_list';
+        const CRASH_KEY = 'crashMultiplier';
+        const PAYMENT_NUMBER_KEY = 'paymentNumber';
+        const GAME_TITLE_KEY = 'gameTitle';
+
+        // লিংক সেটআপ
+        function setupLinks() {
+            const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+            document.getElementById('gameLink').value = baseUrl + 'game.html';
+            document.getElementById('adminLink').value = baseUrl + 'admin.html';
+        }
+
+        function copyGameLink() {
+            const link = document.getElementById('gameLink').value;
+            navigator.clipboard.writeText(link);
+            showMessage('✓ গেম লিংক কপি হয়েছে!', 'success');
+        }
+
+        function copyAdminLink() {
+            const link = document.getElementById('adminLink').value;
+            navigator.clipboard.writeText(link);
+            showMessage('✓ এডমিন লিংক কপি হয়েছে!', 'success');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            updateAllStats();
+        }
+
+        function updateAllStats() {
+            const balance = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+            const crash = parseFloat(localStorage.getItem(CRASH_KEY)) || 1.5;
+            const deposits = JSON.parse(localStorage.getItem(DEPOSITS_KEY)) || [];
+            const withdraws = JSON.parse(localStorage.getItem(WITHDRAWS_KEY)) || [];
+
+            document.getElementById('currentBalance').innerText = `৳${balance.toLocaleString('bn-BD')}`;
+            document.getElementById('dashBalance').innerText = `৳${balance.toLocaleString('bn-BD')}`;
+            document.getElementById('crashDisplay').innerText = crash.toFixed(2) + 'x';
+            document.getElementById('dashCrash').innerText = crash.toFixed(2) + 'x';
+            document.getElementById('crashInput').value = crash;
+
+            let pendingDep = 0, approvedDep = 0;
+            deposits.forEach(d => {
+                if (d.status === 'pending') pendingDep++;
+                if (d.status === 'approved') approvedDep++;
+            });
+
+            let pendingWit = 0, approvedWit = 0;
+            withdraws.forEach(w => {
+                if (w.status === 'pending') pendingWit++;
+                if (w.status === 'approved') approvedWit++;
+            });
+
+            document.getElementById('dashPendingDep').innerText = pendingDep;
+            document.getElementById('dashPendingWit').innerText = pendingWit;
+
+            loadTransactions();
+        }
+
+        function showMessage(msg, type) {
+            const el = document.getElementById('message');
+            el.innerText = msg;
+            el.className = `message show ${type}`;
+            setTimeout(() => el.className = 'message', 3000);
+        }
+
+        window.addBalance = function() {
+            const amount = parseFloat(document.getElementById('addAmount').value);
+            if (!amount || amount < 1) {
+                showMessage('সঠিক পরিমাণ লিখুন!', 'error');
+                return;
+            }
+            let balance = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+            balance += amount;
+            localStorage.setItem(STORAGE_KEY, balance);
+            document.getElementById('addAmount').value = '';
+            showMessage(`✓ ৳${amount} যোগ করা হয়েছে!`, 'success');
+            updateAllStats();
+        };
+
+        window.quickAdd = function(amount) {
+            let balance = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+            balance += amount;
+            localStorage.setItem(STORAGE_KEY, balance);
+            showMessage(`✓ ৳${amount} যোগ করা হয়েছে!`, 'success');
+            updateAllStats();
+        };
+
+        window.deductBalance = function() {
+            const amount = parseFloat(document.getElementById('deductAmount').value);
+            if (!amount || amount < 1) {
+                showMessage('সঠিক পরিমাণ লিখুন!', 'error');
+                return;
+            }
+            let balance = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+            if (balance < amount) {
+                showMessage('ব্যালেন্স যথেষ্ট নেই!', 'error');
+                return;
+            }
+            balance -= amount;
+            localStorage.setItem(STORAGE_KEY, balance);
+            document.getElementById('deductAmount').value = '';
+            showMessage(`✓ ৳${amount} কাটা হয়েছে!`, 'success');
+            updateAllStats();
+        };
+
+        window.resetBalance = function() {
+            if (!confirm('সত্যিই ব্যালেন্স ০ করতে চান?')) return;
+            localStorage.setItem(STORAGE_KEY, 0);
+            showMessage('✓ ব্যালেন্স রিসেট করা হয়েছে!', 'success');
+            updateAllStats();
+        };
+
+        window.setCrash = function() {
+            const value = parseFloat(document.getElementById('crashInput').value);
+            if (value < 1.01 || value > 99.99) {
+                showMessage('१.०१ থেকে ९९.९९ এর মধ্যে দিন!', 'error');
+                return;
+            }
+            localStorage.setItem(CRASH_KEY, value);
+            showMessage(`✓ ক্রাশ সেট: ${value.toFixed(2)}x`, 'success');
+            updateAllStats();
+        };
+
+        window.quickCrash = function(value) {
+            localStorage.setItem(CRASH_KEY, value);
+            showMessage(`✓ ক্রাশ সেট: ${value.toFixed(2)}x`, 'success');
+            updateAllStats();
+        };
+
+        window.randomCrash = function() {
+            const crash = (Math.random() * 98.98 + 1.01).toFixed(2);
+            localStorage.setItem(CRASH_KEY, crash);
+            showMessage(`✓ র‍্যান্ডম ক্রাশ: ${crash}x`, 'success');
+            updateAllStats();
+        };
+
+        window.updatePaymentNumber = function() {
+            const number = document.getElementById('paymentNumber').value;
+            if (!number) {
+                showMessage('পেমেন্ট নম্বর লিখুন!', 'error');
+                return;
+            }
+            localStorage.setItem(PAYMENT_NUMBER_KEY, number);
+            showMessage('✓ পেমেন্ট নম্বর সেভ হয়েছে!', 'success');
+        };
+
+        window.updateGameTitle = function() {
+            const title = document.getElementById('gameTitle').value;
+            if (!title) {
+                showMessage('গেম শিরোনাম লিখুন!', 'error');
+                return;
+            }
+            localStorage.setItem(GAME_TITLE_KEY, title);
+            showMessage('✓ গেম শিরোনাম সেভ হয়েছে!', 'success');
+        };
+
+        function loadTransactions() {
+            const deposits = JSON.parse(localStorage.getItem(DEPOSITS_KEY)) || [];
+            const withdraws = JSON.parse(localStorage.getItem(WITHDRAWS_KEY)) || [];
+
+            let depHtml = '';
+            deposits.forEach((dep, idx) => {
+                const statusClass = dep.status === 'pending' ? 'status-pending' : (dep.status === 'approved' ? 'status-approved' : 'status-rejected');
+                const statusText = dep.status === 'pending' ? '⏳ পেন্ডিং' : (dep.status === 'approved' ? '✓ অনুমোদিত' : '✗ প্রত্যাখ্যাত');
+
+                depHtml += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-user">📱 ${dep.phoneNumber}</div>
+                            <div class="transaction-details">
+                                TrxID: ${dep.transactionId}<br>
+                                সময়: ${new Date(dep.createdAt).toLocaleString('bn-BD')}
+                            </div>
+                        </div>
+                        <div class="transaction-amount">৳${dep.amount}</div>
+                        <div class="transaction-status ${statusClass}">${statusText}</div>
+                        ${dep.status === 'pending' ? `
+                            <div class="transaction-actions">
+                                <button class="btn btn-success" onclick="approveDeposit(${idx})" style="padding: 6px 12px; width: auto; margin: 0;">✓</button>
+                                <button class="btn btn-danger" onclick="rejectDeposit(${idx})" style="padding: 6px 12px; width: auto; margin: 0;">✗</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            document.getElementById('depositsList').innerHTML = depHtml || '<div style="text-align: center; padding: 40px; color: #8b949e;">কোনো ডিপোজিট নেই</div>';
+
+            let witHtml = '';
+            withdraws.forEach((wit, idx) => {
+                const statusClass = wit.status === 'pending' ? 'status-pending' : (wit.status === 'approved' ? 'status-approved' : 'status-rejected');
+                const statusText = wit.status === 'pending' ? '⏳ পেন্ডিং' : (wit.status === 'approved' ? '✓ অনুমোদিত' : '✗ প্রত্যাখ্যাত');
+                const methodText = wit.method === 'bkash' ? 'বিকাশ' : wit.method === 'nagad' ? 'নগদ' : 'রকেট';
+
+                witHtml += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-user">📱 ${wit.phoneNumber}</div>
+                            <div class="transaction-details">
+                                মেথড: ${methodText}<br>
+                                সময়: ${new Date(wit.createdAt).toLocaleString('bn-BD')}
+                            </div>
+                        </div>
+                        <div class="transaction-amount">৳${wit.amount}</div>
+                        <div class="transaction-status ${statusClass}">${statusText}</div>
+                        ${wit.status === 'pending' ? `
+                            <div class="transaction-actions">
+                                <button class="btn btn-success" onclick="approveWithdraw(${idx})" style="padding: 6px 12px; width: auto; margin: 0;">✓</button>
+                                <button class="btn btn-danger" onclick="rejectWithdraw(${idx})" style="padding: 6px 12px; width: auto; margin: 0;">✗</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            document.getElementById('withdrawsList').innerHTML = witHtml || '<div style="text-align: center; padding: 40px; color: #8b949e;">কোনো উইথড্র নেই</div>';
+        }
+
+        window.approveDeposit = function(idx) {
+            const deposits = JSON.parse(localStorage.getItem(DEPOSITS_KEY)) || [];
+            const dep = deposits[idx];
+            
+            let balance = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+            balance += dep.amount;
+            localStorage.setItem(STORAGE_KEY, balance);
+            
+            deposits[idx].status = 'approved';
+            localStorage.setItem(DEPOSITS_KEY, JSON.stringify(deposits));
+            
+            showMessage(`✓ ডিপোজিট অনুমোদিত! ৳${dep.amount} যোগ হয়েছে`, 'success');
+            updateAllStats();
+        };
+
+        window.rejectDeposit = function(idx) {
+            const deposits = JSON.parse(localStorage.getItem(DEPOSITS_KEY)) || [];
+            deposits[idx].status = 'rejected';
+            localStorage.setItem(DEPOSITS_KEY, JSON.stringify(deposits));
+            
+            showMessage('✗ ডিপোজিট প্রত্যাখ্যাত করা হয়েছে', 'error');
+            updateAllStats();
+        };
+
+        window.approveWithdraw = function(idx) {
+            const withdraws = JSON.parse(localStorage.getItem(WITHDRAWS_KEY)) || [];
+            withdraws[idx].status = 'approved';
+            localStorage.setItem(WITHDRAWS_KEY, JSON.stringify(withdraws));
+            
+            showMessage('✓ উইথড্র অনুমোদিত!', 'success');
+            updateAllStats();
+        };
+
+        window.rejectWithdraw = function(idx) {
+            const withdraws = JSON.parse(localStorage.getItem(WITHDRAWS_KEY)) || [];
+            const wit = withdraws[idx];
+            
+            let balance = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+            balance += wit.amount;
+            localStorage.setItem(STORAGE_KEY, balance);
+            
+            withdraws[idx].status = 'rejected';
+            localStorage.setItem(WITHDRAWS_KEY, JSON.stringify(withdraws));
+            
+            showMessage(`✗ উইথড্র প্রত্যাখ্যাত! ৳${wit.amount} ফেরত দেওয়া হয়েছে`, 'error');
+            updateAllStats();
+        };
+
+        setupLinks();
+        updateAllStats();
+        setInterval(updateAllStats, 1000);
+        window.addEventListener('storage', updateAllStats);
+    </script>
+</body>
+</html>
