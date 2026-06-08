@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✈️ ক্রাশ গেম</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f2e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+            animation: glow 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes glow {
+            0%, 100% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.2) translate(20px, 20px); }
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(118, 75, 162, 0.3);
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px;
+            font-size: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover { color: #667eea; }
+        .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .game-area {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .game-area::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse-light 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes pulse-light {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.3); opacity: 0.8; }
+        }
+        
+        .airplane-container {
+            position: relative;
+            height: 100px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            z-index: 2;
+        }
+        
+        .airplane {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            font-size: 50px;
+            transition: all 0.1s;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+        
+        .airplane.flying { animation: flyUp 8s ease-in forwards; }
+        .airplane.crashed { animation: crashDown 0.8s ease-in forwards; }
+        
+        @keyframes flyUp {
+            0% { left: 20px; bottom: 10px; transform: rotate(0deg); }
+            100% { left: 350px; bottom: 80px; transform: rotate(-25deg); }
+        }
+        
+        @keyframes crashDown {
+            0% { transform: rotate(-25deg); }
+            100% { transform: rotate(90deg) translateY(80px); }
+        }
+        
+        .multiplier-display {
+            font-size: 60px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            z-index: 2;
+            position: relative;
+        }
+        
+        .game-info {
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.9;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .balance-section {
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .balance-label { color: #666; font-size: 12px; margin-bottom: 5px; }
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .quick-bets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .quick-bet-btn {
+            padding: 10px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .quick-bet-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        #playBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        #playBtn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        #playBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        #cashOutBtn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            display: none;
+            animation: pulse-btn 1s infinite;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        @keyframes pulse-btn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        #cashOutBtn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-label { color: #666; font-size: 12px; margin-bottom: 5px; }
+        .stat-value { color: #667eea; font-size: 20px; font-weight: bold; }
+        
+        .deposit-info {
+            background: linear-gradient(135deg, #e7f3ff 0%, #f0f9ff 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.1);
+        }
+        
+        .deposit-info strong { color: #667eea; }
+        
+        .payment-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+            user-select: all;
+            border: 2px solid #667eea;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .payment-number:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.02);
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="gameTitle">✈️ ক্রাশ গেম</h1>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('game')">🎮 খেলা</button>
+            <button class="tab-btn" onclick="switchTab('deposit')">📥 ডিপোজিট</button>
+            <button class="tab-btn" onclick="switchTab('withdraw')">📤 উইথড্র</button>
+        </div>
+
+        <div id="game" class="tab-content active">
+            <div id="gameMessage" class="message"></div>
+
+            <div class="game-area" id="gameArea">
+                <div class="airplane-container">
+                    <div class="airplane" id="airplane">✈️</div>
+                </div>
+                <div>
+                    <div class="multiplier-display" id="multiplierDisplay">1.00x</div>
+                    <div class="game-info" id="gameTimer">প্রস্তুত</div>
+                </div>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">আপনার ব্যালেন্স</div>
+                <div class="balance-amount">৳<span id="userBalance">0</span></div>
+            </div>
+
+            <div>
+                <input type="number" id="betAmount" placeholder="বেট লিখুন (৳)" min="100" value="100">
+                <div class="quick-bets">
+                    <button class="quick-bet-btn" onclick="setBet(100)">100</button>
+                    <button class="quick-bet-btn" onclick="setBet(500)">500</button>
+                    <button class="quick-bet-btn" onclick="setBet(1000)">1000</button>
+                    <button class="quick-bet-btn" onclick="setBet(5000)">5000</button>
+                </div>
+            </div>
+
+            <button id="playBtn" onclick="startGame()">▶️ খেলা শুরু করো!</button>
+            <button id="cashOutBtn" onclick="cashOut()">💰 ক্যাশ আউট!</button>
+
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div class="stat-label">সম্ভাব্য জয়</div>
+                    <div class="stat-value">৳<span id="potentialWin">0</span></div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">লাস্ট জয়</div>
+                    <div class="stat-value">৳<span id="lastWin">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="deposit" class="tab-content">
+            <div id="depositMessage" class="message"></div>
+
+            <div class="deposit-info">
+                <strong>📝 ডিপোজিট নির্দেশনা:</strong><br>
+                1️⃣ নিচের নম্বরে টাকা পাঠান<br>
+                2️⃣ ট্রানজ্যাকশন ID লিখুন<br>
+                3️⃣ ফোন নম্বর দিন<br>
+                4️⃣ সাবমিট করুন
+            </div>
+
+            <div style="background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 10px; font-weight: bold; color: #333;">📱 পেমেন্ট নম্বর</div>
+                <div class="payment-number" id="paymentNumberDisplay" onclick="copyNumber(this.innerText)">01333900587</div>
+                <div style="text-align: center; font-size: 12px; color: #666; margin-top: 8px;">বিকাশ / নগদ (ক্লিক করলে কপি হবে)</div>
+            </div>
+
+            <input type="text" placeholder="ট্রানজ্যাকশন ID" id="depositTxId">
+            <input type="text" placeholder="আপনার ফোন নম্বর" id="depositPhone">
+            <input type="number" placeholder="পরিমাণ (৳)" id="depositAmount" min="100">
+            <button onclick="submitDeposit()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">📥 ডিপোজিট পাঠান</button>
+        </div>
+
+        <div id="withdraw" class="tab-content">
+            <div id="withdrawMessage" class="message"></div>
+
+            <div class="deposit-info">
+                <strong>📝 উইথড্র নির্দেশনা:</strong><br>
+                1️⃣ মেথড নির্বাচন করুন<br>
+                2️⃣ ফোন নম্বর লিখুন<br>
+                3️⃣ পরিমাণ লিখুন<br>
+                4️⃣ সাবমিট করুন
+            </div>
+
+            <select id="withdrawMethod">
+                <option value="">মেথড নির্বাচন করুন</option>
+                <option value="bkash">💳 বিকাশ</option>
+                <option value="nagad">💳 নগদ</option>
+                <option value="rocket">💳 রকেট</option>
+            </select>
+            <input type="text" placeholder="আপনার ফোন নম্বর" id="withdrawPhone">
+            <input type="number" placeholder="পরিমাণ (৳)" id="withdrawAmount" min="100">
+            <button onclick="submitWithdraw()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">📤 উইথড্র পাঠান</button>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'playerBalance';
+        const DEPOSITS_KEY = 'deposits_list';
+        const WITHDRAWS_KEY = 'withdraws_list';
+        const CRASH_KEY = 'crashMultiplier';
+        const PAYMENT_NUMBER_KEY = 'paymentNumber';
+        const GAME_TITLE_KEY = 'gameTitle';
+
+        let gameState = {
+            userBalance: parseInt(localStorage.getItem(STORAGE_KEY)) || 0,
+            currentMultiplier: 1.0,
+            gameActive: false,
+            betAmount: 0,
+            multiplierInterval: null,
+            targetMultiplier: parseFloat(localStorage.getItem(CRASH_KEY)) || 1.5
+        };
+
+        function updateDisplay() {
+            document.getElementById('userBalance').innerText = Math.floor(gameState.userBalance).toLocaleString('bn-BD');
+            
+            // পেমেন্ট নম্বর আপডেট করুন
+            const paymentNumber = localStorage.getItem(PAYMENT_NUMBER_KEY) || '01333900587';
+            document.getElementById('paymentNumberDisplay').innerText = paymentNumber;
+            
+            // গেম টাইটেল আপডেট করুন
+            const gameTitle = localStorage.getItem(GAME_TITLE_KEY) || '✈️ ক্রাশ গেম';
+            document.getElementById('gameTitle').innerText = gameTitle;
+        }
+
+        function saveBalance() {
+            localStorage.setItem(STORAGE_KEY, gameState.userBalance);
+        }
+
+        updateDisplay();
+
+        setInterval(() => {
+            const newCrash = parseFloat(localStorage.getItem(CRASH_KEY)) || 1.5;
+            gameState.targetMultiplier = newCrash;
+        }, 1000);
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === STORAGE_KEY) {
+                gameState.userBalance = parseInt(e.newValue) || 0;
+                updateDisplay();
+            }
+            if (e.key === PAYMENT_NUMBER_KEY || e.key === GAME_TITLE_KEY) {
+                updateDisplay();
+            }
+        });
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function copyNumber(number) {
+            navigator.clipboard.writeText(number);
+            alert('✓ নম্বর কপি হয়েছে: ' + number);
+        }
+
+        window.setBet = function(amount) {
+            if (!gameState.gameActive) {
+                document.getElementById('betAmount').value = amount;
+                updatePotentialWin();
+            }
+        };
+
+        function updatePotentialWin() {
+            const bet = parseFloat(document.getElementById('betAmount').value) || 0;
+            const win = bet * gameState.currentMultiplier;
+            document.getElementById('potentialWin').innerText = Math.floor(win).toLocaleString('bn-BD');
+        }
+
+        document.getElementById('betAmount').addEventListener('input', updatePotentialWin);
+
+        window.startGame = function() {
+            if (gameState.gameActive) return;
+
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            if (!bet || bet > gameState.userBalance) {
+                showGameMessage("সঠিক বেট লিখুন বা যথেষ্ট ব্যালেন্স নেই!", 'error');
+                return;
+            }
+
+            gameState.gameActive = true;
+            gameState.betAmount = bet;
+            gameState.userBalance -= bet;
+            gameState.currentMultiplier = 1.0;
+
+            saveBalance();
+            updateDisplay();
+
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('cashOutBtn').style.display = 'block';
+            document.getElementById('gameArea').style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+
+            const airplane = document.getElementById('airplane');
+            airplane.classList.remove('crashed');
+            airplane.classList.add('flying');
+
+            let elapsed = 0;
+            gameState.multiplierInterval = setInterval(() => {
+                if (!gameState.gameActive) return;
+
+                elapsed += 50;
+                gameState.currentMultiplier = 1.0 + (elapsed / 3000);
+                document.getElementById('multiplierDisplay').innerText = gameState.currentMultiplier.toFixed(2) + 'x';
+                document.getElementById('gameTimer').innerText = (elapsed / 1000).toFixed(1) + 's';
+
+                if (gameState.currentMultiplier >= gameState.targetMultiplier) {
+                    crashGame();
+                }
+            }, 50);
+
+            showGameMessage('🎮 গেম শুরু হয়েছে!', 'success');
+        };
+
+        window.cashOut = function() {
+            if (!gameState.gameActive) return;
+
+            gameState.gameActive = false;
+            clearInterval(gameState.multiplierInterval);
+
+            const win = gameState.betAmount * gameState.currentMultiplier;
+            gameState.userBalance += win;
+
+            saveBalance();
+            updateDisplay();
+
+            document.getElementById('lastWin').innerText = Math.floor(win).toLocaleString('bn-BD');
+            showGameMessage(`🎉 জিতেছ! ৳${Math.floor(win).toLocaleString('bn-BD')}`, 'success');
+            resetGame();
+        };
+
+        function crashGame() {
+            gameState.gameActive = false;
+            clearInterval(gameState.multiplierInterval);
+
+            const airplane = document.getElementById('airplane');
+            airplane.classList.remove('flying');
+            airplane.classList.add('crashed');
+
+            document.getElementById('gameArea').style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+            showGameMessage(`💥 ক্র্যাশ! ${gameState.currentMultiplier.toFixed(2)}x`, 'error');
+
+            saveBalance();
+            setTimeout(() => resetGame(), 1500);
+        }
+
+        function resetGame() {
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('cashOutBtn').style.display = 'none';
+            document.getElementById('gameArea').style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            document.getElementById('gameTimer').innerText = 'প্রস্তুত';
+            document.getElementById('multiplierDisplay').innerText = '1.00x';
+            document.getElementById('betAmount').value = '';
+            updatePotentialWin();
+        }
+
+        function showGameMessage(msg, type) {
+            const el = document.getElementById('gameMessage');
+            el.innerText = msg;
+            el.className = `message show ${type}`;
+            setTimeout(() => el.className = 'message', 3000);
+        }
+
+        function showDepositMessage(msg, type) {
+            const el = document.getElementById('depositMessage');
+            el.innerText = msg;
+            el.className = `message show ${type}`;
+            setTimeout(() => el.className = 'message', 3000);
+        }
+
+        function showWithdrawMessage(msg, type) {
+            const el = document.getElementById('withdrawMessage');
+            el.innerText = msg;
+            el.className = `message show ${type}`;
+            setTimeout(() => el.className = 'message', 3000);
+        }
+
+        window.submitDeposit = function() {
+            const txId = document.getElementById('depositTxId').value;
+            const phone = document.getElementById('depositPhone').value;
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+
+            if (!txId || !phone || !amount) {
+                showDepositMessage("সব তথ্য পূরণ করুন!", 'error');
+                return;
+            }
+
+            const deposits = JSON.parse(localStorage.getItem(DEPOSITS_KEY)) || [];
+            deposits.push({
+                id: Date.now(),
+                transactionId: txId,
+                phoneNumber: phone,
+                amount: amount,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            });
+
+            localStorage.setItem(DEPOSITS_KEY, JSON.stringify(deposits));
+            showDepositMessage("✓ রিকোয়েস্ট পাঠানো হয়েছে! এডমিন অনুমোদন দেবে।", 'success');
+            
+            document.getElementById('depositTxId').value = '';
+            document.getElementById('depositPhone').value = '';
+            document.getElementById('depositAmount').value = '';
+        };
+
+        window.submitWithdraw = function() {
+            const method = document.getElementById('withdrawMethod').value;
+            const phone = document.getElementById('withdrawPhone').value;
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+
+            if (!method || !phone || !amount) {
+                showWithdrawMessage("সব তথ্য পূরণ করুন!", 'error');
+                return;
+            }
+
+            if (amount > gameState.userBalance) {
+                showWithdrawMessage("যথেষ্ট ব্যালেন্স নেই!", 'error');
+                return;
+            }
+
+            const withdraws = JSON.parse(localStorage.getItem(WITHDRAWS_KEY)) || [];
+            withdraws.push({
+                id: Date.now(),
+                method: method,
+                phoneNumber: phone,
+                amount: amount,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            });
+
+            localStorage.setItem(WITHDRAWS_KEY, JSON.stringify(withdraws));
+
+            gameState.userBalance -= amount;
+            saveBalance();
+            updateDisplay();
+
+            showWithdrawMessage("✓ উইথড্র রিকোয়েস্ট পাঠানো হয়েছে! এডমিন অনুমোদন দেবে।", 'success');
+            
+            document.getElementById('withdrawMethod').value = '';
+            document.getElementById('withdrawPhone').value = '';
+            document.getElementById('withdrawAmount').value = '';
+        };
+    </script>
+</body>
+</html>
