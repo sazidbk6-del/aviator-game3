@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✈️ এভিয়েটর গেম - লঞ্চপ্যাড</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f2e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            color: white;
+        }
+        
+        .btn-game {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-game:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-admin {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-admin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+        }
+        
+        .info {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✈️ এভিয়েটর গেম</h1>
+        <p style="color: #666; margin-bottom: 30px; font-size: 16px;">স্বাগতম! আপনার লিংক বেছে নিন:</p>
+        
+        <div class="btn-container">
+            <a href="game.html" class="btn btn-game">🎮 গেম খেলতে যান</a>
+            <a href="admin.html" class="btn btn-admin">🔐 এডমিন প্যানেল</a>
+        </div>
+        
+        <div class="info">
+            <strong>ℹ️ গেম খেলতে:</strong> "গেম খেলতে যান" বাটনে ক্লিক করুন<br>
+            <strong>🔐 নিয়ন্ত্রণের জন্য:</strong> "এডমিন প্যানেল" বাটনে ক্লিক করুন
+        </div>
+    </div>
+</body>
+</html>
